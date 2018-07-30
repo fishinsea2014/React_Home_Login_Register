@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+    <meta charset="UTF-8" />
+	<script src='node_modules/react/umd/react.development.js'></script>
+	<script src='node_modules/react-dom/umd/react-dom.development.js'></script>
+    <script src='node_modules/babel-standalone/babel.min.js'></script>
+    <style>
+    .login{
+        width:300px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 50vh;
+        transform: translate(0,-50%);
+    }
+    .login label{
+        display: inline-block;
+        width:80px;
+        text-align:right;
+    }
+    
+    .login .title{
+        text-align: center; 
+        font-size: 20px;
+    }
+    .login input{
+        height:30px;
+        border-radius: 5px;
+        margin-left:5px;
+        border:1px solid grey;
+        width:200px;
+    }
+
+    .login button{
+        padding:5px 10px;
+        border:1px solid grey;
+        border-radius: 5px;
+        float: right;
+    }
+    .login .btn{
+        height: 30px;
+        position: relative;
+    }
+    .login a{
+        position:absolute;
+        bottom:0;
+        font-size: 12px;
+        margin-left:60px;
+        color:blue;
+        cursor: pointer;
+
+    }
+    .login .error{
+        margin-left:85px;
+        color:red;
+    }
+    </style>
+</head>
+<body>
+    <div id="my"></div>
+    <script type="text/babel">
+    var emailfilter=/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+    var password=/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{8,16}$/;
+     class Input extends React.Component{
+        constructor(){
+            super();
+            this.state = {
+                value:'',
+                error:''
+            };
+        };
+        handleEmail(e){
+            var value = e.target.value;
+            var filter=this.props.filter;
+            if(this.props.require=='true'&&!value){
+                this.setState({
+                    value:value,
+                    error:this.props.label+'can not be empty'
+                })
+                this.props.getEmail(value,false);  
+                return;
+            }
+            var error='';
+            if(!filter.test(value)){
+                error=this.props.error;
+                   this.setState({
+                    value:value,
+                    error:error
+                })
+                this.props.getEmail(value,false);  
+                return;
+            };
+               this.setState({
+                    value:value,
+                    error:error
+                })
+            this.props.getEmail(value,true);        
+        }
+        render(){ 
+            return (
+                    <p>
+                        <label>{this.props.label} :</label>
+                        <input type="text"
+                          value={this.state.value} 
+                          onChange={(e)=>this.handleEmail(e)}/><br/>
+                          <span className="error">{this.state.error}</span>
+                    </p>
+            )
+        }
+    }
+
+     class Password extends React.Component{
+        constructor(){
+            super();
+            this.state = {
+                value:'',
+                error:''
+            };
+        };
+        handleEmail(e){
+            var value = e.target.value;
+            var filter=this.props.filter;
+            if(!value){
+                this.setState({
+                    value:value,
+                    error:'Password can not be empty'
+                })
+                this.props.getPwd(value,false);  
+                return;
+            }
+             var error='';
+            if(!filter.test(value)){
+                error=this.props.error;
+                   this.setState({
+                    value:value,
+                    error:error
+                })
+                this.props.getPwd(value,false);  
+                return;
+            };
+            if(this.props.pwd&&this.props.pwd!=value){
+                 this.setState({
+                    value:value,
+                    error:'The two passwords are not match'
+                })
+                 this.props.getPwd(value,false);  
+                return;
+            }
+
+           this.setState({
+                value:value,
+                error:error
+            })
+            this.props.getPwd(value,true);        
+        }
+        render(){ 
+            return (
+                    <p>
+                        <label>{this.props.label} :</label>
+                        <input type="password"
+                          value={this.state.value} 
+                          onChange={(e)=>this.handleEmail(e)}/><br/>
+                          <span className="error">{this.state.error}</span>
+                    </p>
+            )
+        }
+    }
+    class Login extends React.Component{
+        constructor(){
+            super();
+            this.state = {
+                flag:true,
+                error:false,
+                email:'',
+                pwd:'',
+                pwd1:''
+            };
+        };
+        goRegister(){
+              this.setState({
+                flag:!this.state.flag
+            })
+        }
+        getEmail(value,err){
+             this.setState({
+                email:value,
+                error:err
+            })
+        }
+        getPwd(value,err){
+             this.setState({
+                pwd:value,
+                error:err
+            })
+        }
+        getPwd1(value,err){
+        debugger;
+             this.setState({
+             pwd1:value,
+                error:err
+            })
+        }
+        submit() {
+        debugger
+            if(this.state.email&&this.state.pwd&&this.state.pwd1&&this.state.error){
+                if(this.state.flag){
+                    console.log("Login",this.state);
+                }else{
+                    console.log("Register",this.state);
+                }
+                
+            }else{
+                alert("Format error");
+            }
+          
+        }
+        
+        render(){ 
+         if(this.state.flag){
+            return (
+
+                <div className='login'>
+                    <div className="title">Login</div>
+                   <Input key="l1" label='Email' error='Email format error' filter={emailfilter} require="true" getEmail={(val,err)=>this.getEmail(val,err)}>  </Input>
+                    <Password  key="lr1" label='Password' error='Should be 8-16 number or letters' filter={password}  getPwd={(val,err)=>this.getPwd(val,err)}>  </Password>
+                    <p className="btn">
+                        <a onClick={()=>this.goRegister()}>No such user, please go to register</a>
+                        <button onClick={()=>this.submit()}>Submit</button>
+                    </p>
+                </div>
+                )
+            }
+            else{
+                return(
+                    <div className='login'>
+                        <div className="title">Register</div>
+                       <Input key="r1" label='Email' error='Email format error' filter={emailfilter} require="true" getEmail={(val,err)=>this.getEmail(val,err)}>  </Input>
+                         <Password key="r2" label='Password' error='Should be 8-16 number or letters' filter={password}  getPwd={(val,err)=>this.getPwd(val)}>  </Password>
+                        <Password  key="r3" label='Confirm password' error='Should be 8-16 number or letters' filter={password} pwd={this.state.pwd} getPwd={(val,err)=>this.getPwd1(val,err) }>  </Password>
+                        <p className="btn">
+                            <a onClick={()=>this.goRegister()}>The account already exists, please login</a>
+                            <button onClick={()=>this.submit()}>Submit</button>
+                        </p>
+                    </div>
+                )
+            }
+        }
+    };
+     ReactDOM.render(
+            <Login/>,
+        document.getElementById('my')
+    )
+    </script>
+</body>
+</html>
